@@ -58,6 +58,9 @@ import p58_img from "./product_58.png";
 import p59_img from "./product_59.png";
 import p60_img from "./product_60.png";
 import p61_img from "./product_61.png";
+import p62_img from "./product_62.png";
+import p63_img from "./product_63.png";
+import p64_img from "./product_64.png";
 
 let all_product = [
     {
