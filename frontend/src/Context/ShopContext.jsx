@@ -1,3 +1,4 @@
+
 import React, { createContext, useEffect, useState } from "react";
 
 export const ShopContext = createContext(null);
@@ -13,13 +14,14 @@ const getDefaultCart = () =>{
 
 const ShopContextProvider = (props) => {
 
-    const [all_product,setAll_Product] = useState([]);
+    const [allProducts,setAllProducts] = useState([]);
     const [cartItems,setCartItems] = useState(getDefaultCart());
+    const [userCarts, setUserCarts] = useState([]);
 
     useEffect(()=>{
         fetch('http://localhost:4000/allproducts')
         .then((response)=>response.json())
-        .then((data)=>setAll_Product(data))
+        .then((data)=>setAllProducts(data))
 
         if(localStorage.getItem('auth-token')){
             fetch('http://localhost:4000/getcart',{
@@ -33,7 +35,18 @@ const ShopContextProvider = (props) => {
             }).then((response)=>response.json())
             .then((data)=>setCartItems(data));
         }
-    },[])
+        fetch('http://localhost:4000/getallusercarts')
+            .then((response) => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
+            .then((data) => setUserCarts(data))
+            .catch((error) => {
+                console.error('Error fetching user carts:', error);
+            });
+    }, []);
 
 
 
@@ -79,7 +92,7 @@ const ShopContextProvider = (props) => {
             {
                 if(cartItems[item]>0)
                     {
-                        let itemInfo = all_product.find((product)=>product.id===Number(item))
+                        let itemInfo = allProducts.find((product)=>product.id===Number(item))
                         totalAmount += itemInfo.new_price*cartItems[item];
                     } 
             }
@@ -97,8 +110,23 @@ const ShopContextProvider = (props) => {
             }
             return totalItem;
     }
+    const getRelatedProducts = (productId) => {
+        const relatedProductIds = new Set();
 
-    const contextValue = { getTotalCartItems,getTotalCartAmount,all_product,cartItems, addToCart, removeFromCart };
+        userCarts.forEach(userCart => {
+            if (userCart.cartData[productId] > 0) {
+                Object.keys(userCart.cartData).forEach(itemId => {
+                    if (itemId !== productId.toString() && userCart.cartData[itemId] > 0) {
+                        relatedProductIds.add(Number(itemId));
+                    }
+                });
+            }
+        });
+
+        return allProducts.filter(product => relatedProductIds.has(product.id));
+    }
+
+    const contextValue = { getTotalCartItems,getTotalCartAmount,allProducts,cartItems, addToCart, removeFromCart, getRelatedProducts };
 
 
     return (
