@@ -34,12 +34,12 @@ const ProductDisplay = (props) => {
                     <div className="productdisplay-right-price-old">${product.old_price}</div>
                     <div className="productdisplay-right-price-new">${product.new_price}</div>
                 </div>
-                <div className="productdisplay-right-description">
+                {/* <div className="productdisplay-right-description">
                     A description is here 
                     Lorem ipsum dolor sit amet consectetur adipisicing elit. Ad recusandae ipsa, quasi animi aliquam aspernatur quam assumenda eius officia tempore a adipisci est rerum doloremque esse unde maxime quisquam fugiat?
 
-                </div>
-                <div className="productdisplay-right-size">
+                </div> */}
+                {/* <div className="productdisplay-right-size">
                     <h1>Select Size</h1>
                     <div className="productdisplay-right-sizes">
                         <div>S</div>
@@ -48,7 +48,7 @@ const ProductDisplay = (props) => {
                         <div>XL</div>
                         <div>XLL</div>
                     </div>
-                </div>
+                </div> */}
                 <button onClick={()=>{addToCart(product.id)}}>ADD TO CART</button>
                 <p className="productdisplay-right-category"><span>Category: </span>Women, Tshirt, Croptop</p>
                 <p className="productdisplay-right-category"><span>Tags: </span>Mordern, Latest</p>
