@@ -4,9 +4,14 @@ import star_icon from '../Assets/star_icon.png'
 import star_dull_icon from '../Assets/star_dull_icon.png'
 import { ShopContext } from "../../Context/ShopContext";
 
-const ProductDisplay = (props) => {
-    const {product} = props;
-    const {addToCart} = useContext(ShopContext);
+const ProductDisplay = ({ product }) => {
+    const { addToCart, setProductDescription } = useContext(ShopContext);
+
+    // Cập nhật mô tả sản phẩm khi sản phẩm được chọn
+    const handleProductSelect = () => {
+        setProductDescription(product.description);
+    };
+
     return (
         <div className="productdisplay">
             <div className="productdisplay-left">
@@ -17,7 +22,7 @@ const ProductDisplay = (props) => {
                     <img src={product.image} alt="" />
                 </div>
                 <div className="productdisplay-img">
-                    <img  className='productdisplay-main-img' src={product.image} alt="" />
+                    <img className='productdisplay-main-img' src={product.image} alt="" />
                 </div>
             </div>
             <div className="productdisplay-right">
@@ -34,28 +39,18 @@ const ProductDisplay = (props) => {
                     <div className="productdisplay-right-price-old">${product.old_price}</div>
                     <div className="productdisplay-right-price-new">${product.new_price}</div>
                 </div>
-                {/* <div className="productdisplay-right-description">
-                    A description is here 
-                    Lorem ipsum dolor sit amet consectetur adipisicing elit. Ad recusandae ipsa, quasi animi aliquam aspernatur quam assumenda eius officia tempore a adipisci est rerum doloremque esse unde maxime quisquam fugiat?
+                {/* Loại bỏ nút "Show Description", mô tả hiển thị ngay khi sản phẩm được chọn */}
+                <button onClick={() => { addToCart(product.id) }}>ADD TO CART</button>
 
-                </div> */}
-                {/* <div className="productdisplay-right-size">
-                    <h1>Select Size</h1>
-                    <div className="productdisplay-right-sizes">
-                        <div>S</div>
-                        <div>M</div>
-                        <div>L</div>
-                        <div>XL</div>
-                        <div>XLL</div>
-                    </div>
-                </div> */}
-                <button onClick={()=>{addToCart(product.id)}}>ADD TO CART</button>
+                
+                <p className="productdisplay-right-category"><span>Description: </span>{product.description}</p>
+                
+                    
                 <p className="productdisplay-right-category"><span>Category: </span>{product.category}</p>
                 <p className="productdisplay-right-category"><span>Tags: </span>{product.tags.join(', ')}</p>
-
             </div>
         </div>
     )
 }
 
-export default ProductDisplay
+export default ProductDisplay;
