@@ -59,6 +59,10 @@ const Product = mongoose.model("Product",{
         type:String,
         required:true,
     },
+    tags:{
+        type: [String],
+        require:true,
+    },
     new_price:{
         type:Number,
         required:true,
@@ -75,6 +79,10 @@ const Product = mongoose.model("Product",{
         type:Boolean,
         default:true,
     },
+    description:{
+        type:String,
+        require:true,
+    }
 })
 
 app.post('/addproduct',async (req,res)=>{
@@ -93,8 +101,10 @@ app.post('/addproduct',async (req,res)=>{
         name:req.body.name,
         image:req.body.image,
         category:req.body.category,
+        tags:req.body.tags,
         new_price:req.body.new_price,
         old_price:req.body.old_price,
+        description:req.body.description,
     });
     console.log(product);
     await product.save();
@@ -196,6 +206,87 @@ app.post('/login',async(req,res)=>{
     else{
         res.json({success:false,error:"Wrong email id"})
     }
+})
+
+//creating endpoint fỏr new collection data
+app.get('/newcollections',async(req,res)=>{
+    let products = await Product.find({});
+    let newcollection = products.slice(1).slice(-8);
+    console.log("NewCollection fetched");
+    res.send(newcollection);
+})
+
+//creating endpoint for popular in dolls section
+app.get('/popularindolls',async(req,res)=>{
+    let products = await Product.find({category:"dolls"})
+    let popular_in_dolls = products.slice(0,4);
+    console.log("Popular in dolls fetched");
+    res.send(popular_in_dolls);
+})
+
+//creating endpoint for popular in animals section
+app.get('/popularinanimals', async (req, res) => {
+    try {
+        let products = await Product.find({ category: "animals" });
+        let popular_in_animals = products.slice(0, 4);
+        console.log("Popular in animals fetched");
+        res.send(popular_in_animals);
+    } catch (error) {
+        console.error("Error fetching animals:", error);
+        res.status(500).send("Error fetching animals");
+    }
+});
+
+//creating endpoint for popular in tools section
+app.get('/popularintools',async(req,res)=>{
+    let products = await Product.find({category:"tools"})
+    let popular_in_tools = products.slice(0,4);
+    console.log("Popular in tools fetched");
+    res.send(popular_in_tools);
+})
+
+
+//creating middleware to fetch user
+    const fetchUser = async (req,res,next)=>{
+        const token = req.header('auth-token');
+        if (!token){
+            res.status(401).send({errors:"Please authenticate using valid token"})
+        }
+        else{
+            try {
+                const data =jwt.verify(token,'secret_ecom')
+                req.user = data.user;
+                next();
+            } catch (error){
+                res.status(401).send({error:"Please authenticate using a valid token"})
+            }
+        }
+    }
+
+//creating endpoint for adding products in cartdata
+app.post('/addtocart',fetchUser,async(req,res)=>{
+    console.log("added",req.body.itemId);
+    let userData = await Users.findOne({_id:req.user.id});
+    userData.cartData[req.body.itemId] +=1;
+    await Users.findOneAndUpdate({_id:req.user.id},{cartData:userData.cartData});
+    res.send("Added")
+})
+
+//creating endpoint to remove product from cartdata
+app.post('/removefromcart',fetchUser,async(req,res)=>{
+    console.log("removed",req.body.itemId);
+    let userData = await Users.findOne({_id:req.user.id});
+    if (userData.cartData[req.body.itemId]>0)
+    userData.cartData[req.body.itemId] -=1;
+    await Users.findOneAndUpdate({_id:req.user.id},{cartData:userData.cartData});
+    res.send("Removed")
+})
+
+//creating endpoint to get cartdata
+app.post('/getcart',fetchUser,async(req,res)=>{
+    console.log("Get cart");
+    let userData = await Users.findOne({_id:req.user.id});
+    res.json(userData.cartData);
 })
 
 app.listen(port,(error)=>{
