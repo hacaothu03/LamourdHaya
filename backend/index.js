@@ -299,3 +299,10 @@ app.listen(port,(error)=>{
 })
 
 
+app.get('/getallusercarts', (req, res) => {
+    Users.find({}, { cartData: 1 })
+        .then(Users => {
+            res.json(Users);
+        })
+        .catch(err => res.status(500).json({ message: 'Server error', err }));
+});
