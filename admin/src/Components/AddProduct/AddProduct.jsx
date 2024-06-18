@@ -1,63 +1,61 @@
 import React, { useState } from "react";
-import './AddProduct.css'
-import upload_area from '../../assets/upload_area.svg'
+import './AddProduct.css';
+import upload_area from '../../assets/upload_area.svg';
 
-const AddProduct =() => {
-        const [image,setImage] = useState(false);
-        const [productDetails,setProductDetails] = useState({
-            name:"",
-            image:"",
-            category:"animals",
-            new_price:"",
-            old_price:""
-        })
+const AddProduct = () => {
+    const [image, setImage] = useState(false);
+    const [productDetails, setProductDetails] = useState({
+        name: "",
+        image: "",
+        category: "animals",
+        tags: "",
+        new_price: "",
+        old_price: "",
+        description: ""  // Thêm trường description
+    });
 
-        const imageHandler = (e) =>{
-            setImage(e.target.files[0]);
-        }
+    const imageHandler = (e) => {
+        setImage(e.target.files[0]);
+    }
 
-        const changeHandler = (e) => {
-            setProductDetails({...productDetails,[e.target.name]:e.target.value})
-        }
+    const changeHandler = (e) => {
+        setProductDetails({ ...productDetails, [e.target.name]: e.target.value });
+    }
 
-        const Add_Product = async () =>{
-            console.log(productDetails);
-            let responseData;
-            let product = productDetails;
+    const Add_Product = async () => {
+        console.log(productDetails);
+        let responseData;
+        let product = productDetails;
 
-            let formData = new FormData();
-            formData.append('product',image);
+        let formData = new FormData();
+        formData.append('product', image);
 
+        await fetch('http://localhost:4000/upload', {
+            method: 'POST',
+            headers: {
+                Accept: 'application/json',
+            },
+            body: formData,
+        }).then((resp) => resp.json()).then((data) => { responseData = data });
 
-            await fetch('http://localhost:4000/upload',{
-                method:'POST',
-                headers:{
-                    Accept:'application/json',
+        if (responseData.success) {
+            product.image = responseData.image_url;
+            setProductDetails(product);
+            console.log(product);
+            await fetch('http://localhost:4000/addproduct', {
+                method: 'POST',
+                headers: {
+                    Accept: 'application/json',
+                    'Content-Type': 'application/json',
                 },
-                body:formData,
-            }).then((resp)=> resp.json()).then((data)=>{responseData=data})
-        
-
-            if(responseData.success){
-                product.image = responseData.image_url;
-                setProductDetails(product);
-                console.log(product);
-                await fetch('http://localhost:4000/addproduct',{
-                    method:'POST',
-                    headers:{
-                        Accept:'application/json',
-                        'Content-Type':'application/json',
-                    },
-                    body:JSON.stringify(product),
-                }).then((resp)=>resp.json()).then((data)=>{
-                    data.success?alert("Product Added"):alert("Failed")
-                })
-            }
+                body: JSON.stringify(product),
+            }).then((resp) => resp.json()).then((data) => {
+                data.success ? alert("Product Added") : alert("Failed")
+            })
         }
+    }
 
-
-
-    return(
+    return (
         <div className="add-product">
             <div className="addproduct-itemfield">
                 <p>Product title</p>
@@ -67,11 +65,11 @@ const AddProduct =() => {
                 <div className="addproduct-itemfield">
                     <p>Price</p>
                     <input value={productDetails.old_price} onChange={changeHandler} type="text" name="old_price" placeholder="Type here" />
-                 </div>
-                 <div className="addproduct-itemfield">
+                </div>
+                <div className="addproduct-itemfield">
                     <p>Offer Price</p>
                     <input value={productDetails.new_price} onChange={changeHandler} type="text" name="new_price" placeholder="Type here" />
-                 </div>
+                </div>
             </div>
             <div className="addproduct-itemfield">
                 <p>Product Category</p>
@@ -82,14 +80,22 @@ const AddProduct =() => {
                 </select>
             </div>
             <div className="addproduct-itemfield">
+                <p>Product tags</p>
+                <input value={productDetails.tags} onChange={changeHandler} type="text" name='tags' placeholder="Type tags separated by commas" />
+            </div>
+            <div className="addproduct-itemfield">
+                <p>Product Description</p>
+                <textarea value={productDetails.description} onChange={changeHandler} type="text" name="description" placeholder="Type here" />
+            </div>
+            <div className="addproduct-itemfield">
                 <label htmlFor="file-input">
-                    <img src={image?URL.createObjectURL(image):upload_area} className="addproduct-thumnail-img" alt="" />
+                    <img src={image ? URL.createObjectURL(image) : upload_area} className="addproduct-thumbnail-img" alt="" />
                 </label>
                 <input onChange={imageHandler} type="file" name='image' id='file-input' hidden />
             </div>
-            <button onClick={()=>{Add_Product()}} className="addproduct-btn">ADD</button>
+            <button onClick={() => { Add_Product() }} className="addproduct-btn">ADD</button>
         </div>
     )
 }
 
-export default AddProduct
+export default AddProduct;

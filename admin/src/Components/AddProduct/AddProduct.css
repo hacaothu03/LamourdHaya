@@ -27,6 +27,19 @@
     font-size: 14px;
 }
 
+.addproduct-itemfield textarea{
+    box-sizing: border-box;
+    width: 100%;
+    height: 50px;
+    border-radius: 4px;
+    padding-left: 15px;
+    border: 1px solid #c3c3c3;
+    outline: none;
+    color: #7b7b7b;
+    font-family: 'Poppins';
+    font-size: 14px;
+}
+
 .addproduct-price{
     display: flex;
     gap: 40px;
